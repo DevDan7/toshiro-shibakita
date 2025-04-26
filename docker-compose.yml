@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # Servicio web (Nginx + PHP)
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./index.php:/usr/share/nginx/html/index.php
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - db
+
+  # Servicio de base de datos MySQL
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: Senha123
+      MYSQL_DATABASE: meubanco
+    volumes:
+      - ./banco.sql:/docker-entrypoint-initdb.d/banco.sql
+      - db_data:/var/lib/mysql
+
+  # phpMyAdmin para administrar la BD (opcional)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+    depends_on:
+      - db
+
+volumes:
+  db_data:
